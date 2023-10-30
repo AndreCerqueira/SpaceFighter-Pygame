@@ -9,8 +9,8 @@ vmin_yellow, vmax_yellow = 50, 255
 # Valores HSV para face vermelha
 hmin_red1, hmax_red1 = 0, 10
 hmin_red2, hmax_red2 = 160, 180
-smin_red, smax_red = 50, 255
-vmin_red, vmax_red = 50, 255
+smin_red, smax_red = 130, 255
+vmin_red, vmax_red = 120, 255
 
 # Valores HSV para face verde
 hmin_green, hmax_green = 35, 85
