@@ -2,39 +2,39 @@ import pygame
 import cv2
 from game_constants import *
 
-def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health):
+def draw_window(red, green, red_bullets, green_bullets, red_health, green_health):
 
     WIN.blit(SPACE, (0, 0))
     pygame.draw.rect(WIN, BLACK, BORDER)
 
     red_health_text = HEALTH_FONT.render("Health: " + str(red_health), 1, WHITE)
-    yellow_health_text = HEALTH_FONT.render("Health: " + str(yellow_health), 1, WHITE)
+    green_health_text = HEALTH_FONT.render("Health: " + str(green_health), 1, WHITE)
     WIN.blit(red_health_text, (WIDTH - red_health_text.get_width() - 10, 10))
-    WIN.blit(yellow_health_text, (10, 10))
+    WIN.blit(green_health_text, (10, 10))
 
-    WIN.blit(YELLOW_SPACESHIP, (yellow.x, yellow.y))
+    WIN.blit(GREEN_SPACESHIP, (green.x, green.y))
     WIN.blit(RED_SPACESHIP, (red.x, red.y))
 
     for bullet in red_bullets:
         pygame.draw.rect(WIN, RED, bullet)
 
-    for bullet in yellow_bullets:
-        pygame.draw.rect(WIN, YELLOW, bullet)
+    for bullet in green_bullets:
+        pygame.draw.rect(WIN, GREEN, bullet)
 
     pygame.display.update()
 
-def yellow_handle_movement(position, yellow):
+def green_handle_movement(position, green):
     if position:
         x_center, y_center, w, h = position
 
         # Mova a nave apenas verticalmente para a posição detectada
-        yellow.y = y_center - SPACESHIP_HEIGHT // 2
+        green.y = y_center - SPACESHIP_HEIGHT // 2
 
         # Garanta que a nave não ultrapasse as bordas superior e inferior da tela
-        if yellow.y < 0:
-            yellow.y = 0
-        if yellow.y + SPACESHIP_HEIGHT > HEIGHT:
-            yellow.y = HEIGHT - SPACESHIP_HEIGHT
+        if green.y < 0:
+            green.y = 0
+        if green.y + SPACESHIP_HEIGHT > HEIGHT:
+            green.y = HEIGHT - SPACESHIP_HEIGHT
 
 def red_handle_movement(position, red):
     if position:
@@ -49,20 +49,20 @@ def red_handle_movement(position, red):
         if red.y + SPACESHIP_HEIGHT > HEIGHT:
             red.y = HEIGHT - SPACESHIP_HEIGHT
 
-def handle_bullets(yellow_bullets, red_bullets, yellow, red):
+def handle_bullets(green_bullets, red_bullets, green, red):
 
-    for bullet in yellow_bullets:
+    for bullet in green_bullets:
         bullet.x += BULLET_VEL
         if red.colliderect(bullet):
             pygame.event.post(pygame.event.Event(RED_HIT))
-            yellow_bullets.remove(bullet)
+            green_bullets.remove(bullet)
         elif bullet.x > WIDTH:
-            yellow_bullets.remove(bullet)
+            green_bullets.remove(bullet)
 
     for bullet in red_bullets:
         bullet.x -= BULLET_VEL
-        if yellow.colliderect(bullet):
-            pygame.event.post(pygame.event.Event(YELLOW_HIT))
+        if green.colliderect(bullet):
+            pygame.event.post(pygame.event.Event(GREEN_HIT))
             red_bullets.remove(bullet)
         elif bullet.x < 0:
             red_bullets.remove(bullet)
@@ -73,3 +73,4 @@ def draw_winner(text):
         HEIGHT/2 - draw_text.get_height()/2))
     pygame.display.update()
     pygame.time.delay(3000)
+
