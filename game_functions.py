@@ -29,14 +29,14 @@ def draw_window(red, green, red_bullets, green_bullets, red_health, green_health
 def green_handle_movement(position, green):
     # Handle the green spaceship's vertical movement
     if position:
-        x_center, y_center, w, h = position
+        x_center, y_center = position
         green.y = y_center - SPACESHIP_HEIGHT // 2
         green.y = max(0, min(green.y, HEIGHT - SPACESHIP_HEIGHT))
 
 def red_handle_movement(position, red):
     # Handle the red spaceship's vertical movement
     if position:
-        x_center, y_center, w, h = position
+        x_center, y_center = position
         red.y = y_center - SPACESHIP_HEIGHT // 2
         red.y = max(0, min(red.y, HEIGHT - SPACESHIP_HEIGHT))
 

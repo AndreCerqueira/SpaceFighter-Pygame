@@ -13,6 +13,9 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
+CLASS_ID_GREEN = 67
+CLASS_ID_RED = 47
+
 BORDER = pygame.Rect(WIDTH//2 - 5, 0, 10, HEIGHT)
 
 # Uncomment when sounds are added
