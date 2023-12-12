@@ -1,10 +1,5 @@
-import cv2
-import pygame
-from ultralytics import YOLO
-from game_constants import *
 from game_functions import *
-# from computer_vision.color_segmentation import update_segmentation_red, update_segmentation_green
-from computer_vision.object_detection import update_detection_yolo
+from computer_vision.tracking import update_tracker_green, update_tracker_red
 
 def main():
     last_green_shot = 0
@@ -12,7 +7,11 @@ def main():
     green = pygame.Rect(100, 300, SPACESHIP_WIDTH, SPACESHIP_HEIGHT)
     red = pygame.Rect(700, 300, SPACESHIP_WIDTH, SPACESHIP_HEIGHT)
 
-    model = YOLO("yolov8n.pt")
+    # Initialize tracker - replace or augment object detection
+    tracker_green = cv2.TrackerKCF_create()
+    tracker_red = cv2.TrackerKCF_create()
+
+    #model = YOLO("yolov8n.pt")
 
     red_bullets = []
     green_bullets = []
@@ -28,13 +27,36 @@ def main():
     if not cap.isOpened():
         cap.open(0)
 
+        ret, frame = cap.read()
+        frame = frame[:, ::-1, :].copy()
+        cv2.putText(frame, 'Select Green Player', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2,
+                    cv2.LINE_AA)
+
+        bbox_green = cv2.selectROI("Select Green Player", frame, False)
+        tracker_green.init(frame, bbox_green)
+
+        frame = cap.read()[1]
+        frame = frame[:, ::-1, :].copy()
+        cv2.putText(frame, 'Select Red Player', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2,
+                    cv2.LINE_AA)
+
+        bbox_red = cv2.selectROI("Select Red Player", frame, False)
+        tracker_red.init(frame, bbox_red)
+
     while run:
         clock.tick(FPS)
         if not cap.isOpened():
             cap.open(0)
         ret, frame = cap.read()
         frame = frame[:, ::-1, :].copy()
-        yolo_objects = update_detection_yolo(frame, model)
+
+        # Atualize o rastreador para o jogador verde
+        x_green = update_tracker_green(frame, tracker_green, green)
+
+        # Atualize o rastreador para o jogador vermelho
+        x_red = update_tracker_red(frame, tracker_red, red)
+
+        #yolo_objects = update_detection_yolo(frame, model)
 
         # Convert frame to HSV color space for color segmentation
         # image_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -50,6 +72,18 @@ def main():
         green_line_x = 200
         red_line_x = width - 200
         current_time = pygame.time.get_ticks()
+
+        # Lógica de disparo para a nave verde
+        if x_green > green_line_x and current_time - last_green_shot > BULLET_DELAY:
+            bullet = pygame.Rect(green.x + SPACESHIP_WIDTH, green.y + SPACESHIP_HEIGHT // 2 - 2, 10, 5)
+            green_bullets.append(bullet)
+            last_green_shot = current_time
+
+        # Lógica de disparo para a nave vermelha
+        if x_red < red_line_x and current_time - last_red_shot > BULLET_DELAY:
+            bullet = pygame.Rect(red.x - 10, red.y + SPACESHIP_HEIGHT // 2 - 2, 10, 5)
+            red_bullets.append(bullet)
+            last_red_shot = current_time
 
         # Shooting logic for green and red spaceships
         '''
@@ -68,6 +102,7 @@ def main():
         # green_handle_movement(position_green, green)
         # red_handle_movement(position_red, red)
 
+        '''
         for object in yolo_objects:
             box = object.boxes.data[0]
             pt1 = (int(box[0]), int(box[1]))
@@ -99,6 +134,7 @@ def main():
                     bullet = pygame.Rect(green.x + SPACESHIP_WIDTH, green.y + SPACESHIP_HEIGHT // 2 - 2, 10, 5)
                     green_bullets.append(bullet)
                     last_green_shot = current_time
+        '''
 
         # Event handling for quitting and hits
         for event in pygame.event.get():
