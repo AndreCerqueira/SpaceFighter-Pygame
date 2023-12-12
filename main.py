@@ -19,6 +19,7 @@ def main():
     red_health = 10
     green_health = 10
 
+
     clock = pygame.time.Clock()
     run = True
 
